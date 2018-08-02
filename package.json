@@ -1,0 +1,27 @@
+{
+  "name": "campaign-open",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prospectr-master/campaign-open.git"
+  },
+  "author": "ZacEvanchak",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/prospectr-master/campaign-open/issues"
+  },
+  "homepage": "https://github.com/prospectr-master/campaign-open#readme",
+  "dependencies": {
+    "base-64": "^0.1.0",
+    "body-parser": "^1.18.3",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3",
+    "mongodb": "^3.1.1",
+    "mongoose": "^5.2.6"
+  }
+}
