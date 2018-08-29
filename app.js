@@ -1,41 +1,44 @@
 require('dotenv').config();
-const mongodb = require('mongodb');
+const MongoClient = require('mongodb').MongoClient;
+const ObjectId = require('mongodb').ObjectID;
 const express = require('express');
 const bp = require('body-parser');
 const base64 = require('base-64');
-const mongoose = require('mongoose');
 const path = require('path');
-const Schema = mongoose.Schema;
+const model = require('./model/model')
 
-const imgByteString = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII=';
-const buf = Buffer.from(imgByteString, 'base64');
-
-
-const mongoConnectString = 'mongodb+srv://' + process.env.MONGOUSER + ':' + process.env.MONGOPASS + '@' + process.env.MONGOURL;
-
-const connection = mongoose.createConnection(mongoConnectString);
+const mongoConnectStringLocal = 'mongodb://localhost:27017';
+// const mongoConnectString = 'mongodb+srv://' + process.env.MONGOUSER + ':' + process.env.MONGOPASS + '@' + process.env.MONGOURL;
 
 let app = express();
 
-// app.use(bp.urlencoded({ extended: true }));
-// app.use(bp.json());
-
-const openSchema = new Schema({
-  client_id: String,
-  date: { type: Date, default: Date.now },
-  email: String,
-  creative_id: String
+// Remove X-Powered-By
+app.use(function (req, res, next) {
+  res.removeHeader("X-Powered-By");
+  next();
 });
 
-const cOpen = mongoose.model('cOpens', openSchema);
+const dbName = 'cOpens';
 
-app.get('/:client_id/:encoded_email/:creative_id', function(req, res) {
+
+app.get('/trk/:client_id/:encoded_email/:creative_id', function(req, res) {
   // Do stuff with the encoded info
-  let open = new cOpen({client_id: req.params.client_id, email: req.params.encoded_email, creative_id: req.params.creative_id})
+  MongoClient.connect(mongoConnectStringLocal, { useNewUrlParser: true }, function(err, client) {
+    if (err) throw err;
+    const db = client.db(dbName);
+    model.getCollection(db, req.params.client_id, function(r) {
+      console.log(r);
+      model.updateOrAdd(db, r, req.params.encoded_email, req.params.creative_id, function(r) {
+        console.log("Document Inserted");
+        client.close();
+      });
+    })
+  });
+  res.status(200).type('png').sendFile(path.join(__dirname + '/pixel/px.png'));
+});
 
-  res.sendFile(path.join(__dirname + '/pixel/px.png'));
-})
+
 
 app.listen(3000, function() {
-  console.log("Listening on port 3000");
+  console.log('listening on port 3000');
 })
