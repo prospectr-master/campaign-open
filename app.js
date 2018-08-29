@@ -37,6 +37,7 @@ app.get('/trk/:client_id/:encoded_email/:creative_id', function(req, res) {
   res.status(200).type('png').sendFile(path.join(__dirname + '/pixel/px.png'));
 });
 
+// Put the click tracker here probably
 
 
 app.listen(3000, function() {
